@@ -36,7 +36,7 @@ public class WorldSelector
 		public void Draw(ref int worldConfig, ImGuiComboFlags flags = ImGuiComboFlags.HeightLarge)
 		{
 				ImGui.PushID(ID);
-				if (ImGui.BeginCombo("", ExcelWorldHelper.GetName(worldConfig), flags))
+				if (ImGui.BeginCombo("", ExcelWorldHelper.GetName((uint)worldConfig), flags))
 				{
 						DrawInternal(ref worldConfig);
 						ImGui.EndCombo();
