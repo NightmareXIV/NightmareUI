@@ -1,5 +1,6 @@
 ﻿using ECommons.DalamudServices;
 using ECommons.ExcelServices;
+using ECommons.GameHelpers;
 using ECommons.ImGuiMethods;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
@@ -26,6 +27,11 @@ public class WorldSelector
 		private string WorldFilter = "";
 		private bool WorldFilterActive = false;
 
+		public string EmptyName { get; set; } = null;
+		public bool DisplayCurrent { get; set; } = false;
+		public bool DefaultAllOpen { get; set; } = false;
+		public Predicate<uint>? ShouldHideWorld { get; set; } = null;
+
 		private string ID;
 
 		public WorldSelector(string id = "##world")
@@ -36,7 +42,16 @@ public class WorldSelector
 		public void Draw(ref int worldConfig, ImGuiComboFlags flags = ImGuiComboFlags.HeightLarge)
 		{
 				ImGui.PushID(ID);
-				if (ImGui.BeginCombo("", ExcelWorldHelper.GetName((uint)worldConfig), flags))
+				string name;
+				if(worldConfig == 0)
+				{
+						name = EmptyName ?? "Not selected";
+				}
+				else
+				{
+						name = ExcelWorldHelper.GetName((uint)worldConfig);
+				}
+				if (ImGui.BeginCombo("", name, flags))
 				{
 						DrawInternal(ref worldConfig);
 						ImGui.EndCombo();
@@ -62,7 +77,10 @@ public class WorldSelector
 										{
 												if (WorldFilter == "" || world.Name.ToString().Contains(WorldFilter, StringComparison.OrdinalIgnoreCase) || world.RowId.ToString().Contains(WorldFilter, StringComparison.OrdinalIgnoreCase))
 												{
-														regions[region][dc.RowId].Add(world.RowId);
+														if (ShouldHideWorld == null || !ShouldHideWorld(world.RowId))
+														{
+																regions[region][dc.RowId].Add(world.RowId);
+														}
 												}
 										}
 										regions[region][dc.RowId] = [.. regions[region][dc.RowId].OrderBy(ExcelWorldHelper.GetName)];
@@ -70,6 +88,24 @@ public class WorldSelector
 						}
 				}
 				ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, new Vector2(0, 1));
+				if(EmptyName != null)
+				{
+						ImGui.SetNextItemOpen(false);
+						if (ImGuiEx.TreeNode($"{EmptyName}##empty", ImGuiTreeNodeFlags.NoTreePushOnOpen | ImGuiTreeNodeFlags.Bullet | (0 == worldConfig ? ImGuiTreeNodeFlags.Selected : ImGuiTreeNodeFlags.None)))
+						{
+								worldConfig = 0;
+								ImGui.CloseCurrentPopup();
+						}
+				}
+				if(DisplayCurrent && Player.Available)
+				{
+						ImGui.SetNextItemOpen(false);
+						if (ImGuiEx.TreeNode(ImGuiColors.DalamudViolet, $"Current: {ExcelWorldHelper.GetName(Player.Object.CurrentWorld.Id)}", ImGuiTreeNodeFlags.NoTreePushOnOpen | ImGuiTreeNodeFlags.Bullet | (Player.Object.CurrentWorld.Id == worldConfig ? ImGuiTreeNodeFlags.Selected : ImGuiTreeNodeFlags.None)))
+						{
+								worldConfig = (int)Player.Object.CurrentWorld.Id;
+								ImGui.CloseCurrentPopup();
+						}
+				}
 				foreach (var region in regions)
 				{
 						if (region.Value.Sum(dc => dc.Value.Count) > 0)
@@ -96,6 +132,7 @@ public class WorldSelector
 												}
 										}
 								}
+								if (DefaultAllOpen && ImGui.IsWindowAppearing()) ImGui.SetNextItemOpen(true);
 								if (ImGuiEx.TreeNode($"{region.Key}"))
 								{
 										foreach (var dc in region.Value)
@@ -117,6 +154,7 @@ public class WorldSelector
 																		ImGui.SetNextItemOpen(false);
 																}
 														}
+														if (DefaultAllOpen && ImGui.IsWindowAppearing()) ImGui.SetNextItemOpen(true);
 														if (ImGuiEx.TreeNode($"{Svc.Data.GetExcelSheet<WorldDCGroupType>()!.GetRow(dc.Key)?.Name}"))
 														{
 																foreach (var world in dc.Value)
