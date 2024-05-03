@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace NightmareUI.PrimaryUI.Components;
 internal class ImGuiWidget : IWidget
@@ -11,6 +12,8 @@ internal class ImGuiWidget : IWidget
 		internal Action<string> DrawAction;
 		internal string? Help;
 		internal float? Width;
+
+		internal bool ShouldDraw => NuiBuilder.Filter == "" || Label.Contains(NuiBuilder.Filter, StringComparison.OrdinalIgnoreCase);
 
 		public ImGuiWidget(string label, Action<string> drawAction, string? help = null)
 		{

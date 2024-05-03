@@ -1,4 +1,5 @@
-﻿using Lumina.Misc;
+﻿using ECommons;
+using Lumina.Misc;
 using System;
 using System.Collections.Frozen;
 using System.Collections.Generic;

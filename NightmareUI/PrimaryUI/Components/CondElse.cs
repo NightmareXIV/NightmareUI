@@ -5,12 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace NightmareUI.PrimaryUI.Components;
-internal class SeparatorWidget : IWidget
+internal class CondElse : IWidget
 {
-		internal Action DrawAction;
-
-		internal SeparatorWidget(Action draw)
-		{
-				DrawAction = draw;
-		}
 }

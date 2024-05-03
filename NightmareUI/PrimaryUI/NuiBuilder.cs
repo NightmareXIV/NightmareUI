@@ -7,22 +7,27 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace NightmareUI.PrimaryUI;
 public class NuiBuilder
 {
+		public static string Filter = "";
+
 		private Section? CurrentSection;
 		private List<Section> Sections = [];
-		private bool Accept = true;
+
+		public bool ShouldDraw => Sections.Any(z => z.ShouldDraw);
 
 		public NuiBuilder() { }
 
 		public NuiBuilder Section(string name)
 		{
-				if (!Accept) return this;
 				CurrentSection = new() { Name = name };
 				Sections.Add(CurrentSection);
 				return this;
@@ -34,29 +39,31 @@ public class NuiBuilder
 				if (CurrentSection == null) throw new NullReferenceException("CurrentSection is null");
 		}
 
-		public NuiBuilder If(bool condition)
+		public NuiBuilder Widget(string name, Action<string> drawAction, string? help = null)
 		{
-				Accept = condition;
+				EnsureSectionNotNull();
+				CurrentSection.Widgets.Add(new ImGuiWidget(name, drawAction, help));
+				return this;
+		}
+
+		public NuiBuilder If(Func<bool> cond)
+		{
+				EnsureSectionNotNull();
+				CurrentSection.Widgets.Add(new CondIf(cond));
 				return this;
 		}
 
 		public NuiBuilder Else()
 		{
-				Accept = !Accept;
+				EnsureSectionNotNull();
+				CurrentSection.Widgets.Add(new CondElse());
 				return this;
 		}
 
 		public NuiBuilder EndIf()
 		{
-				Accept = true;
-				return this;
-		}
-
-		public NuiBuilder Widget(string name, Action<string> drawAction, string? help = null)
-		{
-				if (!Accept) return this;
 				EnsureSectionNotNull();
-				CurrentSection.Widgets.Add(new ImGuiWidget(name, drawAction, help));
+				CurrentSection.Widgets.Add(new CondEndIf());
 				return this;
 		}
 
@@ -65,9 +72,22 @@ public class NuiBuilder
 		public delegate ref float RefFloatDelegate();
 		public delegate ref string RefStringDelegate();
 
+		public NuiBuilder TextWrapped(string text)
+		{
+				EnsureSectionNotNull();
+				CurrentSection.Widgets.Add(new ImGuiWidget("", (x) => ImGuiEx.TextWrapped(text), null));
+				return this;
+		}
+
+		public NuiBuilder TextWrapped(Vector4? col, string text)
+		{
+				EnsureSectionNotNull();
+				CurrentSection.Widgets.Add(new ImGuiWidget("", (x) => ImGuiEx.TextWrapped(col, text), null));
+				return this;
+		}
+
 		public NuiBuilder Checkbox(string name, RefBoolDelegate value, string? help = null)
 		{
-				if (!Accept) return this;
 				EnsureSectionNotNull();
 				CurrentSection.Widgets.Add(new ImGuiWidget(name, (x) => ImGui.Checkbox(x, ref value()), help));
 				return this;
@@ -75,7 +95,6 @@ public class NuiBuilder
 
 		public NuiBuilder InputInt(float width, string name, RefIntDelegate value, string? help = null)
 		{
-				if (!Accept) return this;
 				EnsureSectionNotNull();
 				CurrentSection.Widgets.Add(new ImGuiWidget(name, (x) =>
 				{
@@ -85,9 +104,63 @@ public class NuiBuilder
 				return this;
 		}
 
+		public NuiBuilder InputInt(float width, string name, RefIntDelegate value, int step, int step_fast, string? help = null)
+		{
+				EnsureSectionNotNull();
+				CurrentSection.Widgets.Add(new ImGuiWidget(name, (x) =>
+				{
+						ImGui.SetNextItemWidth(width);
+						ImGui.InputInt(name, ref value(), step, step_fast);
+				}, help));
+				return this;
+		}
+
+		public NuiBuilder DragInt(float width, string name, RefIntDelegate value, string? help = null)
+		{
+				EnsureSectionNotNull();
+				CurrentSection.Widgets.Add(new ImGuiWidget(name, (x) =>
+				{
+						ImGui.SetNextItemWidth(width);
+						ImGui.DragInt(name, ref value());
+				}, help));
+				return this;
+		}
+
+		public NuiBuilder DragInt(float width, string name, RefIntDelegate value, float v_speed, string? help = null)
+		{
+				EnsureSectionNotNull();
+				CurrentSection.Widgets.Add(new ImGuiWidget(name, (x) =>
+				{
+						ImGui.SetNextItemWidth(width);
+						ImGui.DragInt(name, ref value(), v_speed);
+				}, help));
+				return this;
+		}
+
+		public NuiBuilder DragInt(float width, string name, RefIntDelegate value, float v_speed, int v_min, string? help = null)
+		{
+				EnsureSectionNotNull();
+				CurrentSection.Widgets.Add(new ImGuiWidget(name, (x) =>
+				{
+						ImGui.SetNextItemWidth(width);
+						ImGui.DragInt(name, ref value(), v_speed, v_min);
+				}, help));
+				return this;
+		}
+
+		public NuiBuilder DragInt(float width, string name, RefIntDelegate value, float v_speed, int v_min, int v_max, string? help = null)
+		{
+				EnsureSectionNotNull();
+				CurrentSection.Widgets.Add(new ImGuiWidget(name, (x) =>
+				{
+						ImGui.SetNextItemWidth(width);
+						ImGui.DragInt(name, ref value(), v_speed, v_min, v_max);
+				}, help));
+				return this;
+		}
+
 		public NuiBuilder SliderInt(float width, string name, RefIntDelegate value, int min, int max, string? help = null, ImGuiSliderFlags flags = ImGuiSliderFlags.None)
 		{
-				if (!Accept) return this;
 				EnsureSectionNotNull();
 				CurrentSection.Widgets.Add(new ImGuiWidget(name, (x) =>
 				{
@@ -97,9 +170,19 @@ public class NuiBuilder
 				return this;
 		}
 
+		public NuiBuilder SliderFloat(float width, string name, RefFloatDelegate value, float min, float max, string? help = null, ImGuiSliderFlags flags = ImGuiSliderFlags.None)
+		{
+				EnsureSectionNotNull();
+				CurrentSection.Widgets.Add(new ImGuiWidget(name, (x) =>
+				{
+						ImGui.SetNextItemWidth(width);
+						ImGuiEx.SliderFloat(name, ref value(), min, max, "%.3f", flags);
+				}, help));
+				return this;
+		}
+
 		public NuiBuilder Widget(float width, string name, Action<string> drawAction, string? help = null)
 		{
-				if (!Accept) return this;
 				EnsureSectionNotNull();
 				CurrentSection.Widgets.Add(new ImGuiWidget(width, name, drawAction, help));
 				return this;
@@ -107,7 +190,6 @@ public class NuiBuilder
 
 		public NuiBuilder Separator()
 		{
-				if (!Accept) return this;
 				EnsureSectionNotNull();
 				CurrentSection.Widgets.Add(new SeparatorWidget(() =>
 				{
@@ -117,11 +199,15 @@ public class NuiBuilder
 				return this;
 		}
 
-		public void Draw()
+		public NuiBuilder Draw()
 		{
-				foreach(var x in Sections)
+				foreach (var x in Sections)
 				{
-						x.Draw();
+						if (x.ShouldDraw)
+						{
+								x.Draw();
+						}
 				}
+				return this;
 		}
 }
