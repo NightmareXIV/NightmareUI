@@ -16,11 +16,13 @@ public class NuiBuilder
 {
 		private Section? CurrentSection;
 		private List<Section> Sections = [];
+		private bool Accept = true;
 
 		public NuiBuilder() { }
 
 		public NuiBuilder Section(string name)
 		{
+				if (!Accept) return this;
 				CurrentSection = new() { Name = name };
 				Sections.Add(CurrentSection);
 				return this;
@@ -32,24 +34,48 @@ public class NuiBuilder
 				if (CurrentSection == null) throw new NullReferenceException("CurrentSection is null");
 		}
 
+		public NuiBuilder If(bool condition)
+		{
+				Accept = condition;
+				return this;
+		}
+
+		public NuiBuilder Else()
+		{
+				Accept = !Accept;
+				return this;
+		}
+
+		public NuiBuilder EndIf()
+		{
+				Accept = true;
+				return this;
+		}
+
 		public NuiBuilder Widget(string name, Action<string> drawAction, string? help = null)
 		{
+				if (!Accept) return this;
 				EnsureSectionNotNull();
 				CurrentSection.Widgets.Add(new ImGuiWidget(name, drawAction, help));
 				return this;
 		}
 
 		public delegate ref bool RefBoolDelegate();
+		public delegate ref int RefIntDelegate();
+		public delegate ref float RefFloatDelegate();
+		public delegate ref string RefStringDelegate();
+
 		public NuiBuilder Checkbox(string name, RefBoolDelegate value, string? help = null)
 		{
+				if (!Accept) return this;
 				EnsureSectionNotNull();
 				CurrentSection.Widgets.Add(new ImGuiWidget(name, (x) => ImGui.Checkbox(x, ref value()), help));
 				return this;
 		}
 
-		public delegate ref int RefIntDelegate();
 		public NuiBuilder InputInt(float width, string name, RefIntDelegate value, string? help = null)
 		{
+				if (!Accept) return this;
 				EnsureSectionNotNull();
 				CurrentSection.Widgets.Add(new ImGuiWidget(name, (x) =>
 				{
@@ -61,6 +87,7 @@ public class NuiBuilder
 
 		public NuiBuilder SliderInt(float width, string name, RefIntDelegate value, int min, int max, string? help = null, ImGuiSliderFlags flags = ImGuiSliderFlags.None)
 		{
+				if (!Accept) return this;
 				EnsureSectionNotNull();
 				CurrentSection.Widgets.Add(new ImGuiWidget(name, (x) =>
 				{
@@ -72,6 +99,7 @@ public class NuiBuilder
 
 		public NuiBuilder Widget(float width, string name, Action<string> drawAction, string? help = null)
 		{
+				if (!Accept) return this;
 				EnsureSectionNotNull();
 				CurrentSection.Widgets.Add(new ImGuiWidget(width, name, drawAction, help));
 				return this;
@@ -79,6 +107,7 @@ public class NuiBuilder
 
 		public NuiBuilder Separator()
 		{
+				if (!Accept) return this;
 				EnsureSectionNotNull();
 				CurrentSection.Widgets.Add(new SeparatorWidget(() =>
 				{
