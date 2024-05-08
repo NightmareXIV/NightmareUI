@@ -71,6 +71,7 @@ public class NuiBuilder
 		public delegate ref int RefIntDelegate();
 		public delegate ref float RefFloatDelegate();
 		public delegate ref string RefStringDelegate();
+		public delegate ref T RefEnumDelegate<T>() where T : Enum, IConvertible;
 
 		public NuiBuilder TextWrapped(string text)
 		{
@@ -86,10 +87,54 @@ public class NuiBuilder
 				return this;
 		}
 
+		public NuiBuilder EnumCombo<T>(float width, string name, RefEnumDelegate<T> value, IDictionary<T, string>? names = null, string? help = null) where T : Enum, IConvertible
+		{
+				EnsureSectionNotNull();
+				CurrentSection.Widgets.Add(new ImGuiWidget(name, (x) => ImGuiEx.EnumCombo<T>(name, ref value(), names), help));
+				return this;
+		}
+
+		public NuiBuilder EnumComboFullWidth<T>(float? width, string name, RefEnumDelegate<T> value, Func<T, bool> filter = null, IDictionary<T, string>? names = null, string? help = null) where T : Enum, IConvertible
+		{
+				EnsureSectionNotNull();
+				CurrentSection.Widgets.Add(new ImGuiWidget(name, (x) =>
+				{
+						ImGuiEx.TextWrapped(name);
+						if(help != null)
+						{
+								ImGui.SameLine();
+								ImGuiEx.HelpMarker(help);
+						}
+						ImGui.Indent();
+						if (width == null)
+						{
+								ImGuiEx.SetNextItemFullWidth();
+						}
+						else
+						{
+								ImGui.SetNextItemWidth(width.Value);
+						}
+						ImGuiEx.EnumCombo<T>($"##{name}", ref value(), filter, names);
+						ImGui.Unindent();
+				}, null));
+				return this;
+		}
+
 		public NuiBuilder Checkbox(string name, RefBoolDelegate value, string? help = null)
 		{
 				EnsureSectionNotNull();
 				CurrentSection.Widgets.Add(new ImGuiWidget(name, (x) => ImGui.Checkbox(x, ref value()), help));
+				return this;
+		}
+
+		public NuiBuilder SliderIntAsFloat(float width, string name, RefIntDelegate value, int min, int max, float divider = 1000, string? help = null)
+		{
+				EnsureSectionNotNull();
+				CurrentSection.Widgets.Add(new ImGuiWidget(name, (x) =>
+				{
+						ImGui.SetNextItemWidth(width);
+						ImGuiEx.SliderIntAsFloat(name, ref value(), min, max, divider);
+				}, help));
 				return this;
 		}
 
@@ -203,7 +248,7 @@ public class NuiBuilder
 		{
 				foreach (var x in Sections)
 				{
-						if (x.ShouldDraw)
+						//if (x.ShouldDraw)
 						{
 								x.Draw();
 						}

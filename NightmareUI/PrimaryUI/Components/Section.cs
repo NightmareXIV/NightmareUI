@@ -52,7 +52,7 @@ internal class Section
 								if (Cond != null && Cond.Invoke() != CondComp) continue;
 								if(x is ImGuiWidget imGuiWidget)
 								{
-										Vector4? col = (NuiBuilder.Filter != "") ? (ShouldDraw ? ImGuiColors.ParsedGreen : ImGuiColors.DalamudGrey3) : null;
+										Vector4? col = (NuiBuilder.Filter != "") ? (imGuiWidget.ShouldDraw ? ImGuiColors.ParsedGreen : ImGuiColors.DalamudGrey3) : null;
 										PrevSeparator = false;
 										if (col != null) ImGui.PushStyleColor(ImGuiCol.Text, col.Value);
 										try
