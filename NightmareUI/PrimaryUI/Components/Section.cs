@@ -21,9 +21,9 @@ internal class Section
 		internal Func<bool>? Cond = null;
 		internal bool CondComp;
 
-		public bool ShouldDraw => Widgets.OfType<ImGuiWidget>().Any(z => z.ShouldDraw);
+		public bool ShouldHighlight => Widgets.OfType<ImGuiWidget>().Any(z => z.ShouldHighlight);
 
-		internal void Draw()
+		internal void Draw(NuiBuilder builder)
 		{
 				ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(7f));
 				if (ImGui.BeginTable(Name, 1, ImGuiTableFlags.Borders | ImGuiTableFlags.SizingFixedFit))
@@ -52,7 +52,7 @@ internal class Section
 								if (Cond != null && Cond.Invoke() != CondComp) continue;
 								if(x is ImGuiWidget imGuiWidget)
 								{
-										Vector4? col = (NuiBuilder.Filter != "") ? (imGuiWidget.ShouldDraw ? ImGuiColors.ParsedGreen : ImGuiColors.DalamudGrey3) : null;
+										Vector4? col = (builder.Filter != "") ? (imGuiWidget.ShouldHighlight ? ImGuiColors.ParsedGreen : ImGuiColors.DalamudGrey3) : null;
 										PrevSeparator = false;
 										if (col != null) ImGui.PushStyleColor(ImGuiCol.Text, col.Value);
 										try

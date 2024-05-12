@@ -12,6 +12,11 @@ using System.Threading.Tasks;
 namespace NightmareUI;
 public static class NuiTools
 {
+		public static void InitializeSingletonWindows()
+		{
+
+		}
+
 		public static bool RenderResidentialIcon(this uint residentialAetheryte, float? size = null)
 		{
 				var id = residentialAetheryte switch

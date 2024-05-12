@@ -12,18 +12,21 @@ internal class ImGuiWidget : IWidget
 		internal Action<string> DrawAction;
 		internal string? Help;
 		internal float? Width;
+		internal NuiBuilder NuiBuilder;
 
-		internal bool ShouldDraw => NuiBuilder.Filter == "" || Label.Contains(NuiBuilder.Filter, StringComparison.OrdinalIgnoreCase);
+		internal bool ShouldHighlight => NuiBuilder.Filter == "" || Label.Contains(NuiBuilder.Filter, StringComparison.OrdinalIgnoreCase);
 
-		public ImGuiWidget(string label, Action<string> drawAction, string? help = null)
+		public ImGuiWidget(NuiBuilder builder, string label, Action<string> drawAction, string? help = null)
 		{
+				NuiBuilder = builder;
 				Label = label ?? throw new ArgumentNullException(nameof(label));
 				DrawAction = drawAction ?? throw new ArgumentNullException(nameof(drawAction));
 				Help = help;
 		}
 
-		public ImGuiWidget(float width, string label, Action<string> drawAction, string? help = null)
+		public ImGuiWidget(NuiBuilder builder, float width, string label, Action<string> drawAction, string? help = null)
 		{
+				NuiBuilder = builder;
 				Width = width;
 				Label = label ?? throw new ArgumentNullException(nameof(label));
 				DrawAction = drawAction ?? throw new ArgumentNullException(nameof(drawAction));
