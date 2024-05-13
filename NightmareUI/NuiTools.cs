@@ -2,14 +2,11 @@
 using ECommons;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.ImGuiMethods;
-using FFXIVClientStructs.FFXIV.Client.Game;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NightmareUI;
 public static class NuiTools
@@ -33,17 +30,17 @@ public static class NuiTools
 								ImGui.PushStyleColor(ImGuiCol.ButtonHovered, ImGui.GetStyle().Colors[(int)ImGuiCol.ButtonActive]);
 						}
 						var w = width;
-						if((i+1) % maxButtons == 0)
+						if ((i + 1) % maxButtons == 0)
 						{
 								w = ImGui.GetContentRegionAvail().X;
 						}
-						if(ImGui.Button(b.Name, new(w, ImGui.GetFrameHeight())))
+						if (ImGui.Button(b.Name, new(w, ImGui.GetFrameHeight())))
 						{
 								ActiveTab[id] = i;
 						}
-						if((i+1) % maxButtons != 0 && i+1 != buttons.Length)
+						if ((i + 1) % maxButtons != 0 && i + 1 != buttons.Length)
 						{
-								ImGui.SameLine(0,0);
+								ImGui.SameLine(0, 0);
 						}
 						if (act)
 						{
@@ -51,14 +48,18 @@ public static class NuiTools
 						}
 						ImGui.PopStyleVar();
 				}
-				try
+				if (ImGui.BeginChild($"NulToolsTabsChild{id}"))
 				{
-						buttons[ActiveTab[id]].Action();
+						try
+						{
+								buttons[ActiveTab[id]].Action();
+						}
+						catch (Exception e)
+						{
+								e.Log();
+						}
 				}
-				catch (Exception e)
-				{
-						e.Log();
-				}
+				ImGui.EndChild();
 		}
 
 		public record class ButtonInfo
