@@ -45,6 +45,13 @@ public class NuiBuilder
 				return this;
 		}
 
+		public NuiBuilder Widget(Action drawAction)
+		{
+				EnsureSectionNotNull();
+				CurrentSection.Widgets.Add(new ImGuiWidget(this, "", (x) => drawAction(), null));
+				return this;
+		}
+
 		public NuiBuilder If(Func<bool> cond)
 		{
 				EnsureSectionNotNull();
