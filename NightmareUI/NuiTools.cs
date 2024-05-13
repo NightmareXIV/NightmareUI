@@ -18,7 +18,7 @@ public static class NuiTools
 		public static void ButtonTabs(ButtonInfo[][] buttons2d, int maxButtons = int.MaxValue) => ButtonTabs(GenericHelpers.GetCallStackID(), buttons2d, maxButtons);
 		public static void ButtonTabs(string id, ButtonInfo[][] buttons2d, int maxButtons = int.MaxValue)
 		{
-				ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, new Vector2(0, 0));
+				ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, new Vector2(0, 1));
 				for (int q = 0; q < buttons2d.Length; q++)
 				{
 						var buttons = buttons2d[q];
