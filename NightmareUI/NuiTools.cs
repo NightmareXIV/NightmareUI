@@ -14,46 +14,52 @@ using System.Threading.Tasks;
 namespace NightmareUI;
 public static class NuiTools
 {
-		private static Dictionary<string, int> ActiveTab = [];
-		public static void ButtonTabs(ButtonInfo[] buttons, int maxButtons = int.MaxValue) => ButtonTabs(GenericHelpers.GetCallStackID(), buttons, maxButtons);
-		public static void ButtonTabs(string id, ButtonInfo[] buttons, int maxButtons = int.MaxValue)
+		private static Dictionary<string, (int, int)> ActiveTab = [];
+		public static void ButtonTabs(ButtonInfo[][] buttons2d, int maxButtons = int.MaxValue) => ButtonTabs(GenericHelpers.GetCallStackID(), buttons2d, maxButtons);
+		public static void ButtonTabs(string id, ButtonInfo[][] buttons2d, int maxButtons = int.MaxValue)
 		{
-				buttons = buttons.Where(x => x != null).ToArray();
-				maxButtons = Math.Clamp(maxButtons, 1, buttons.Length);
-				if (!ActiveTab.ContainsKey(id)) ActiveTab[id] = 0;
-				var width = ImGui.GetContentRegionAvail().X / maxButtons;
-				for (int i = 0; i < buttons.Length; i++)
+				ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, new Vector2(0, 0));
+				for (int q = 0; q < buttons2d.Length; q++)
 				{
-						var b = buttons[i];
-						var act = ActiveTab[id] == i;
-						ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 0f);
-						if (act)
+						var buttons = buttons2d[q];
+						buttons = buttons.Where(x => x != null).ToArray();
+						maxButtons = Math.Clamp(maxButtons, 1, buttons.Length);
+						if (!ActiveTab.ContainsKey(id)) ActiveTab[id] = (0,0);
+						var width = ImGui.GetContentRegionAvail().X / maxButtons;
+						for (int i = 0; i < buttons.Length; i++)
 						{
-								ImGui.PushStyleColor(ImGuiCol.Button, ImGui.GetStyle().Colors[(int)ImGuiCol.ButtonActive]);
-								ImGui.PushStyleColor(ImGuiCol.ButtonHovered, ImGui.GetStyle().Colors[(int)ImGuiCol.ButtonActive]);
+								var b = buttons[i];
+								var act = ActiveTab[id] == (q, i);
+								ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 0f);
+								if (act)
+								{
+										ImGui.PushStyleColor(ImGuiCol.Button, ImGui.GetStyle().Colors[(int)ImGuiCol.ButtonActive]);
+										ImGui.PushStyleColor(ImGuiCol.ButtonHovered, ImGui.GetStyle().Colors[(int)ImGuiCol.ButtonActive]);
+								}
+								var w = width;
+								if ((i + 1) % maxButtons == 0)
+								{
+										w = ImGui.GetContentRegionAvail().X;
+								}
+								if (ImGui.Button(b.Name, new(w, ImGui.GetFrameHeight())))
+								{
+										ActiveTab[id] = (q, i);
+								}
+								if ((i + 1) % maxButtons != 0 && i + 1 != buttons.Length)
+								{
+										ImGui.SameLine(0, 0);
+								}
+								if (act)
+								{
+										ImGui.PopStyleColor(2);
+								}
+								ImGui.PopStyleVar();
 						}
-						var w = width;
-						if((i+1) % maxButtons == 0)
-						{
-								w = ImGui.GetContentRegionAvail().X;
-						}
-						if(ImGui.Button(b.Name, new(w, ImGui.GetFrameHeight())))
-						{
-								ActiveTab[id] = i;
-						}
-						if((i+1) % maxButtons != 0 && i+1 != buttons.Length)
-						{
-								ImGui.SameLine(0,0);
-						}
-						if (act)
-						{
-								ImGui.PopStyleColor(2);
-						}
-						ImGui.PopStyleVar();
 				}
+				ImGui.PopStyleVar();
 				try
 				{
-						buttons[ActiveTab[id]].Action();
+						buttons2d[ActiveTab[id].Item1][ActiveTab[id].Item2].Action();
 				}
 				catch (Exception e)
 				{
