@@ -5,12 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace NightmareUI.PrimaryUI.Components;
-internal class SeparatorWidget : IWidget
+internal class CondIf : IWidget
 {
-		internal Action DrawAction;
+		internal Func<bool> Predicate;
 
-		internal SeparatorWidget(Action draw)
+		public CondIf(Func<bool> predicate)
 		{
-				DrawAction = draw;
+				Predicate = predicate;
 		}
 }

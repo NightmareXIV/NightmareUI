@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace NightmareUI.PrimaryUI.Components;
 internal class ImGuiWidget : IWidget
@@ -11,16 +12,21 @@ internal class ImGuiWidget : IWidget
 		internal Action<string> DrawAction;
 		internal string? Help;
 		internal float? Width;
+		internal NuiBuilder NuiBuilder;
 
-		public ImGuiWidget(string label, Action<string> drawAction, string? help = null)
+		internal bool ShouldHighlight => NuiBuilder.Filter == "" || Label.Contains(NuiBuilder.Filter, StringComparison.OrdinalIgnoreCase);
+
+		public ImGuiWidget(NuiBuilder builder, string label, Action<string> drawAction, string? help = null)
 		{
+				NuiBuilder = builder;
 				Label = label ?? throw new ArgumentNullException(nameof(label));
 				DrawAction = drawAction ?? throw new ArgumentNullException(nameof(drawAction));
 				Help = help;
 		}
 
-		public ImGuiWidget(float width, string label, Action<string> drawAction, string? help = null)
+		public ImGuiWidget(NuiBuilder builder, float width, string label, Action<string> drawAction, string? help = null)
 		{
+				NuiBuilder = builder;
 				Width = width;
 				Label = label ?? throw new ArgumentNullException(nameof(label));
 				DrawAction = drawAction ?? throw new ArgumentNullException(nameof(drawAction));
