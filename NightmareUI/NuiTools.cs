@@ -2,6 +2,7 @@
 using ECommons;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.ImGuiMethods;
+using ECommons.Logging;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
@@ -11,22 +12,22 @@ using System.Numerics;
 namespace NightmareUI;
 public static class NuiTools
 {
-		private static Dictionary<string, (int, int)> ActiveTab = [];
+		private static Dictionary<string, string> ActiveTab = [];
 		public static void ButtonTabs(ButtonInfo[][] buttons2d, int maxButtons = int.MaxValue) => ButtonTabs(GenericHelpers.GetCallStackID(), buttons2d, maxButtons);
 		public static void ButtonTabs(string id, ButtonInfo[][] buttons2d, int maxButtons = int.MaxValue)
 		{
-				ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, new Vector2(0, 1));
+        ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, new Vector2(0, 1));
 				for (int q = 0; q < buttons2d.Length; q++)
 				{
 						var buttons = buttons2d[q];
 						buttons = buttons.Where(x => x != null).ToArray();
 						maxButtons = Math.Clamp(maxButtons, 1, buttons.Length);
-						if (!ActiveTab.ContainsKey(id)) ActiveTab[id] = (0,0);
+						if (!ActiveTab.ContainsKey(id)) ActiveTab[id] = buttons[0].Name;
 						var width = ImGui.GetContentRegionAvail().X / maxButtons;
 						for (int i = 0; i < buttons.Length; i++)
 						{
 								var b = buttons[i];
-								var act = ActiveTab[id] == (q, i);
+								var act = ActiveTab[id] == b.Name;
 								ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 0f);
 								if (act)
 								{
@@ -40,7 +41,7 @@ public static class NuiTools
 								}
 								if (ImGui.Button(b.Name, new(w, ImGui.GetFrameHeight())))
 								{
-										ActiveTab[id] = (q, i);
+										ActiveTab[id] = buttons[i].Name;
 								}
 								if ((i + 1) % maxButtons != 0 && i + 1 != buttons.Length)
 								{
@@ -56,13 +57,25 @@ public static class NuiTools
 				ImGui.PopStyleVar();
 				if (ImGui.BeginChild($"NuiTabs{id}"))
 				{
-						try
-						{
-								buttons2d[ActiveTab[id].Item1][ActiveTab[id].Item2].Action();
-						}
-						catch (Exception e)
-						{
-								e.Log();
+						if (ActiveTab.TryGetValue(id, out var value)) {
+								try
+								{
+										foreach (var a in buttons2d)
+										{
+												foreach (var b in a)
+												{
+                            if (b != null && b.Name == value)
+														{
+																b.Action();
+														}
+										}
+										}
+								}
+								catch (Exception e)
+								{
+										PluginLog.Error("Error!");
+										e.Log();
+								}
 						}
 				}
 				ImGui.EndChild();
