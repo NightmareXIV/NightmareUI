@@ -124,16 +124,23 @@ public class NuiBuilder
 						ImGui.Unindent();
 				}, null));
 				return this;
-		}
+    }
 
-		public NuiBuilder Checkbox(string name, RefBoolDelegate value, string? help = null)
-		{
-				EnsureSectionNotNull();
-				CurrentSection.Widgets.Add(new ImGuiWidget(this, name, (x) => ImGui.Checkbox(x, ref value()), help));
-				return this;
-		}
+    public NuiBuilder Checkbox(string name, RefBoolDelegate value, string? help = null)
+    {
+        EnsureSectionNotNull();
+        CurrentSection.Widgets.Add(new ImGuiWidget(this, name, (x) => ImGui.Checkbox(x, ref value()), help));
+        return this;
+    }
 
-		public NuiBuilder SliderIntAsFloat(float width, string name, RefIntDelegate value, int min, int max, float divider = 1000, string? help = null)
+    public NuiBuilder CheckboxInverted(string name, RefBoolDelegate value, string? help = null)
+    {
+        EnsureSectionNotNull();
+        CurrentSection.Widgets.Add(new ImGuiWidget(this, name, (x) => ImGuiEx.CheckboxInverted(x, ref value()), help));
+        return this;
+    }
+
+    public NuiBuilder SliderIntAsFloat(float width, string name, RefIntDelegate value, int min, int max, float divider = 1000, string? help = null)
 		{
 				EnsureSectionNotNull();
 				CurrentSection.Widgets.Add(new ImGuiWidget(this, name, (x) =>
