@@ -61,8 +61,17 @@ internal class Section
 												{
 														ImGui.SetNextItemWidth(imGuiWidget.Width.Value);
 												}
-												imGuiWidget.DrawAction(imGuiWidget.Label);
-												if(imGuiWidget.Help != null)
+												ImGui.PopStyleVar();
+												try
+												{
+														imGuiWidget.DrawAction(imGuiWidget.Label);
+												}
+												catch(Exception iex)
+												{
+														iex.Log();
+												}
+                        ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(7f));
+                        if (imGuiWidget.Help != null)
 												{
 														ImGuiEx.HelpMarker(imGuiWidget.Help);
 												}
