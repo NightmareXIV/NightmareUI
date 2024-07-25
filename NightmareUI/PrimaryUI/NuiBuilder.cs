@@ -64,9 +64,23 @@ public class NuiBuilder
 				EnsureSectionNotNull();
 				CurrentSection.Widgets.Add(new CondEndIf());
 				return this;
-		}
+    }
 
-		public delegate ref bool RefBoolDelegate();
+    public NuiBuilder Indent()
+    {
+        EnsureSectionNotNull();
+        CurrentSection.Widgets.Add(new ImGuiWidget(this, "", (x) => ImGui.Indent()));
+        return this;
+    }
+
+    public NuiBuilder Unindent()
+    {
+        EnsureSectionNotNull();
+        CurrentSection.Widgets.Add(new ImGuiWidget(this, "", (x) => ImGui.Unindent()));
+        return this;
+    }
+
+    public delegate ref bool RefBoolDelegate();
 		public delegate ref int RefIntDelegate();
 		public delegate ref float RefFloatDelegate();
 		public delegate ref string RefStringDelegate();
