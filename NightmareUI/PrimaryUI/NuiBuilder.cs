@@ -1,18 +1,11 @@
 ﻿using ECommons.ImGuiMethods;
-using FFXIVClientStructs.FFXIV.Client.UI;
 using ImGuiNET;
 using NightmareUI.PrimaryUI.Components;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Xml;
-using System.Xml.Linq;
 
 namespace NightmareUI.PrimaryUI;
 public class NuiBuilder
@@ -71,9 +64,23 @@ public class NuiBuilder
 				EnsureSectionNotNull();
 				CurrentSection.Widgets.Add(new CondEndIf());
 				return this;
-		}
+    }
 
-		public delegate ref bool RefBoolDelegate();
+    public NuiBuilder Indent()
+    {
+        EnsureSectionNotNull();
+        CurrentSection.Widgets.Add(new ImGuiWidget(this, "", (x) => ImGui.Indent()));
+        return this;
+    }
+
+    public NuiBuilder Unindent()
+    {
+        EnsureSectionNotNull();
+        CurrentSection.Widgets.Add(new ImGuiWidget(this, "", (x) => ImGui.Unindent()));
+        return this;
+    }
+
+    public delegate ref bool RefBoolDelegate();
 		public delegate ref int RefIntDelegate();
 		public delegate ref float RefFloatDelegate();
 		public delegate ref string RefStringDelegate();
