@@ -23,9 +23,12 @@ internal class Section
 
 		public bool ShouldHighlight => Widgets.OfType<ImGuiWidget>().Any(z => z.ShouldHighlight);
 
-		internal void Draw(NuiBuilder builder)
+		private static Vector2 CellPadding = new Vector2(7f);
+
+
+    internal void Draw(NuiBuilder builder)
 		{
-				ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(7f));
+				ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, CellPadding);
 				if (ImGui.BeginTable(Name, 1, ImGuiTableFlags.Borders | ImGuiTableFlags.SizingFixedFit))
 				{
 						ImGui.TableSetupColumn(Name, ImGuiTableColumnFlags.WidthStretch);
@@ -34,6 +37,7 @@ internal class Section
 						if (Color != null) ImGui.PopStyleColor();
 						ImGui.TableNextRow();
 						ImGui.TableNextColumn();
+						ImGui.PopStyleVar();
 						foreach(var x in Widgets)
 						{
 								if(x is CondIf condIf)
@@ -82,7 +86,8 @@ internal class Section
 										}
 								}
 						}
-						ImGui.EndTable();
+            ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, CellPadding);
+            ImGui.EndTable();
 				}
 				ImGui.Dummy(new(5f));
 				ImGui.PopStyleVar();
