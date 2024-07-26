@@ -24,6 +24,7 @@ internal class Section
 
     internal void Draw(NuiBuilder builder)
 		{
+				var oldPadding = ImGui.GetStyle().CellPadding;
 				ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, CellPadding);
 				if (ImGui.BeginTable(Name, 1, ImGuiTableFlags.Borders | ImGuiTableFlags.SizingFixedFit))
 				{
@@ -33,7 +34,6 @@ internal class Section
 						if (Color != null) ImGui.PopStyleColor();
 						ImGui.TableNextRow();
 						ImGui.TableNextColumn();
-						ImGui.PopStyleVar();
 						foreach(var x in Widgets)
 						{
 								if(x is CondIf condIf)
@@ -60,17 +60,17 @@ internal class Section
 												if (imGuiWidget.Width != null)
 												{
 														ImGui.SetNextItemWidth(imGuiWidget.Width.Value);
-												}
-												ImGui.PopStyleVar();
-												try
+                        }
+                        ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, oldPadding);
+                        try
 												{
 														imGuiWidget.DrawAction(imGuiWidget.Label);
 												}
 												catch(Exception iex)
 												{
 														iex.Log();
-												}
-                        ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(7f));
+                        }
+												ImGui.PopStyleVar();
                         if (imGuiWidget.Help != null)
 												{
 														ImGuiEx.HelpMarker(imGuiWidget.Help);
@@ -91,7 +91,6 @@ internal class Section
 										}
 								}
 						}
-            ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, CellPadding);
             ImGui.EndTable();
 				}
 				ImGui.Dummy(new(5f));
