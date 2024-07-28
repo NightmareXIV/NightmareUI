@@ -98,12 +98,12 @@ public static class NuiTools
 		{
 				var id = residentialAetheryte switch
 				{
-						ResidentalAreas.Mist => (new Vector2(0.3651f, 0.0000f), new Vector2(0.4444f, 0.1408f)),
-						ResidentalAreas.The_Lavender_Beds => (new Vector2(0.4444f, 0.0000f), new Vector2(0.5238f, 0.1408f)),
-						ResidentalAreas.The_Goblet => (new Vector2(0.3651f, 0.1408f), new Vector2(0.4444f, 0.2817f)),
-						ResidentalAreas.Empyreum => (new Vector2(0.5238f, 0.0000f), new Vector2(0.6032f, 0.1408f)),
-						ResidentalAreas.Shirogane => (new Vector2(0.7619f, 0.0000f), new Vector2(0.8413f, 0.1408f)),
-						_ => (new Vector2(0.5238f, 0.1408f), new Vector2(0.6032f, 0.2817f))
+						ResidentalAreas.Mist => (new Vector2(0.3382f, 0.0000f), new Vector2(0.4118f, 0.1408f)),
+						ResidentalAreas.The_Lavender_Beds => (new Vector2(0.4118f, 0.0000f), new Vector2(0.4853f, 0.1408f)),
+						ResidentalAreas.The_Goblet => (new Vector2(0.3382f, 0.1408f), new Vector2(0.4118f, 0.2817f)),
+						ResidentalAreas.Empyreum => (new Vector2(0.4853f, 0.0000f), new Vector2(0.5588f, 0.1408f)),
+						ResidentalAreas.Shirogane => (new Vector2(0.7059f, 0.0000f), new Vector2(0.7794f, 0.1408f)),
+						_ => (new Vector2(0.4118f, 0.1408f), new Vector2(0.4853f, 0.2817f))
 				};
 				if (ThreadLoadImageHandler.TryGetTextureWrap("ui/uld/Teleport_hr1.tex", out var tex))
 				{
