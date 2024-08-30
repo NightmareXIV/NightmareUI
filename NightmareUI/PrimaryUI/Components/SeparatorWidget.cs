@@ -3,10 +3,10 @@
 namespace NightmareUI.PrimaryUI.Components;
 internal class SeparatorWidget : IWidget
 {
-		internal Action DrawAction;
+    internal Action DrawAction;
 
-		internal SeparatorWidget(Action draw)
-		{
-				DrawAction = draw;
-		}
+    internal SeparatorWidget(Action draw)
+    {
+        DrawAction = draw;
+    }
 }
