@@ -14,7 +14,7 @@ public static class NuiTools
 {
     private static Dictionary<string, string> ActiveTab = [];
     public static void ButtonTabs(ButtonInfo[][] buttons2d, int maxButtons = int.MaxValue) => ButtonTabs(GenericHelpers.GetCallStackID(), buttons2d, maxButtons);
-    public static void ButtonTabs(string id, ButtonInfo[][] buttons2d, int maxButtons = int.MaxValue)
+    public static void ButtonTabs(string id, ButtonInfo[][] buttons2d, int maxButtons = int.MaxValue, bool child = true)
     {
         ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, new Vector2(0, 1));
         for(var q = 0; q < buttons2d.Length; q++)
@@ -55,7 +55,7 @@ public static class NuiTools
             }
         }
         ImGui.PopStyleVar();
-        if(ImGui.BeginChild($"NuiTabs{id}"))
+        if(!child || ImGui.BeginChild($"NuiTabs{id}"))
         {
             if(ActiveTab.TryGetValue(id, out var value))
             {
@@ -79,7 +79,7 @@ public static class NuiTools
                 }
             }
         }
-        ImGui.EndChild();
+        if(child) ImGui.EndChild();
     }
 
     public record class ButtonInfo
