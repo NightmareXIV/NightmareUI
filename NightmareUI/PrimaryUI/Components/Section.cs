@@ -1,4 +1,5 @@
-﻿using Dalamud.Interface.Colors;
+﻿using Dalamud.Interface;
+using Dalamud.Interface.Colors;
 using ECommons;
 using ECommons.ImGuiMethods;
 using ImGuiNET;
@@ -8,7 +9,7 @@ using System.Linq;
 using System.Numerics;
 
 namespace NightmareUI.PrimaryUI.Components;
-internal class Section
+internal unsafe class Section
 {
     internal string Name = "";
     internal Vector4? Color;
@@ -16,6 +17,7 @@ internal class Section
     internal bool PrevSeparator = false;
     internal Func<bool>? Cond = null;
     internal bool CondComp;
+    internal bool Collapsible;
 
     public bool ShouldHighlight => Widgets.OfType<ImGuiWidget>().Any(z => z.ShouldHighlight);
 
@@ -29,65 +31,89 @@ internal class Section
         if(ImGui.BeginTable(Name, 1, ImGuiTableFlags.Borders | ImGuiTableFlags.SizingFixedFit))
         {
             ImGui.TableSetupColumn(Name, ImGuiTableColumnFlags.WidthStretch);
-            if(Color != null) ImGui.PushStyleColor(ImGuiCol.TableHeaderBg, Color.Value);
-            ImGui.TableHeadersRow();
-            if(Color != null) ImGui.PopStyleColor();
             ImGui.TableNextRow();
             ImGui.TableNextColumn();
-            foreach(var x in Widgets)
+            var isOpen = ImGui.GetStateStorage().GetBoolRef(ImGui.GetID(Name + "NuiSection"));
+            Color ??= ImGui.GetStyle().Colors[(int)ImGuiCol.FrameBg];
+            if(Collapsible && ImGui.IsMouseHoveringRect(ImGui.GetCursorScreenPos() - ImGui.GetStyle().CellPadding,
+                ImGui.GetCursorScreenPos() + ImGui.GetStyle().CellPadding + new Vector2(ImGui.GetContentRegionAvail().X, ImGui.CalcTextSize(Name).Y)
+                ))
             {
-                if(x is CondIf condIf)
+                ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+                Color = ImGui.GetStyle().Colors[(int)ImGuiCol.FrameBgHovered];
+                if(ImGui.IsMouseClicked(ImGuiMouseButton.Left))
                 {
-                    CondComp = true;
-                    Cond = condIf.Predicate;
+                    *isOpen = (byte)(*isOpen == 0 ? 1 : 0);
                 }
-                else if(x is CondElse)
+            }
+            if(Collapsible)
+            {
+                ImGui.PushFont(UiBuilder.IconFont);
+                ImGuiEx.Text((*isOpen != 0? FontAwesomeIcon.Minus : FontAwesomeIcon.Plus).ToIconString());
+                ImGui.PopFont();
+                ImGui.SameLine();
+            }
+            ImGui.TableSetBgColor(ImGuiTableBgTarget.RowBg0, ImGui.ColorConvertFloat4ToU32(Color.Value));
+            ImGuiEx.Text(Name);
+            if(!Collapsible || *isOpen != 0)
+            {
+                ImGui.TableNextRow();
+                ImGui.TableNextColumn();
+                foreach(var x in Widgets)
                 {
-                    CondComp = false;
-                }
-                else if(x is CondEndIf)
-                {
-                    Cond = null;
-                }
-                if(Cond != null && Cond.Invoke() != CondComp) continue;
-                if(x is ImGuiWidget imGuiWidget)
-                {
-                    Vector4? col = (builder.Filter != "") ? (imGuiWidget.ShouldHighlight ? ImGuiColors.ParsedGreen : ImGuiColors.DalamudGrey3) : null;
-                    PrevSeparator = false;
-                    if(col != null) ImGui.PushStyleColor(ImGuiCol.Text, col.Value);
-                    try
+                    if(x is CondIf condIf)
                     {
-                        if(imGuiWidget.Width != null)
-                        {
-                            ImGui.SetNextItemWidth(imGuiWidget.Width.Value);
-                        }
-                        ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, oldPadding);
+                        CondComp = true;
+                        Cond = condIf.Predicate;
+                    }
+                    else if(x is CondElse)
+                    {
+                        CondComp = false;
+                    }
+                    else if(x is CondEndIf)
+                    {
+                        Cond = null;
+                    }
+                    if(Cond != null && Cond.Invoke() != CondComp) continue;
+                    if(x is ImGuiWidget imGuiWidget)
+                    {
+                        Vector4? col = (builder.Filter != "") ? (imGuiWidget.ShouldHighlight ? ImGuiColors.ParsedGreen : ImGuiColors.DalamudGrey3) : null;
+                        PrevSeparator = false;
+                        if(col != null) ImGui.PushStyleColor(ImGuiCol.Text, col.Value);
                         try
                         {
-                            imGuiWidget.DrawAction(imGuiWidget.Label);
+                            if(imGuiWidget.Width != null)
+                            {
+                                ImGui.SetNextItemWidth(imGuiWidget.Width.Value);
+                            }
+                            ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, oldPadding);
+                            try
+                            {
+                                imGuiWidget.DrawAction(imGuiWidget.Label);
+                            }
+                            catch(Exception iex)
+                            {
+                                iex.Log();
+                            }
+                            ImGui.PopStyleVar();
+                            if(imGuiWidget.Help != null)
+                            {
+                                ImGuiEx.HelpMarker(imGuiWidget.Help);
+                            }
                         }
-                        catch(Exception iex)
+                        catch(Exception e)
                         {
-                            iex.Log();
+                            e.Log();
                         }
-                        ImGui.PopStyleVar();
-                        if(imGuiWidget.Help != null)
+                        if(col != null) ImGui.PopStyleColor();
+                    }
+                    else if(x is SeparatorWidget separatorWidget)
+                    {
+                        if(!PrevSeparator)
                         {
-                            ImGuiEx.HelpMarker(imGuiWidget.Help);
+                            separatorWidget.DrawAction();
+                            PrevSeparator = true;
                         }
-                    }
-                    catch(Exception e)
-                    {
-                        e.Log();
-                    }
-                    if(col != null) ImGui.PopStyleColor();
-                }
-                else if(x is SeparatorWidget separatorWidget)
-                {
-                    if(!PrevSeparator)
-                    {
-                        separatorWidget.DrawAction();
-                        PrevSeparator = true;
                     }
                 }
             }
