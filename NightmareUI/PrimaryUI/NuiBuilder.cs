@@ -18,9 +18,9 @@ public class NuiBuilder
 
     public NuiBuilder() { }
 
-    public NuiBuilder Section(string name)
+    public NuiBuilder Section(string name, Vector4? color = null, bool collapsible = false)
     {
-        CurrentSection = new() { Name = name };
+        CurrentSection = new() { Name = name, Collapsible = collapsible, Color = color };
         Sections.Add(CurrentSection);
         return this;
     }
