@@ -4,7 +4,7 @@ using ECommons.ExcelServices;
 using ECommons.GameHelpers;
 using ECommons.ImGuiMethods;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -99,9 +99,9 @@ public class WorldSelector
         if(DisplayCurrent && Player.Available)
         {
             ImGui.SetNextItemOpen(false);
-            if(ImGuiEx.TreeNode(ImGuiColors.DalamudViolet, $"Current: {ExcelWorldHelper.GetName(Player.Object.CurrentWorld.Id)}", ImGuiTreeNodeFlags.NoTreePushOnOpen | ImGuiTreeNodeFlags.Bullet | (Player.Object.CurrentWorld.Id == worldConfig ? ImGuiTreeNodeFlags.Selected : ImGuiTreeNodeFlags.None)))
+            if(ImGuiEx.TreeNode(ImGuiColors.DalamudViolet, $"Current: {ExcelWorldHelper.GetName(Player.Object.CurrentWorld.RowId)}", ImGuiTreeNodeFlags.NoTreePushOnOpen | ImGuiTreeNodeFlags.Bullet | (Player.Object.CurrentWorld.RowId == worldConfig ? ImGuiTreeNodeFlags.Selected : ImGuiTreeNodeFlags.None)))
             {
-                worldConfig = (int)Player.Object.CurrentWorld.Id;
+                worldConfig = (int)Player.Object.CurrentWorld.RowId;
                 ImGui.CloseCurrentPopup();
             }
         }
@@ -126,7 +126,7 @@ public class WorldSelector
                         foreach(var v in region.Value)
                         {
                             ImGui.PushID($"{region.Key}");
-                            ImGui.GetStateStorage().SetInt(ImGui.GetID($"{Svc.Data.GetExcelSheet<WorldDCGroupType>()!.GetRow(v.Key)?.Name}"), 0);
+                            ImGui.GetStateStorage().SetInt(ImGui.GetID($"{Svc.Data.GetExcelSheet<WorldDCGroupType>()!.GetRowOrDefault(v.Key)?.Name}"), 0);
                             ImGui.PopID();
                         }
                     }
@@ -154,7 +154,7 @@ public class WorldSelector
                                 }
                             }
                             if(DefaultAllOpen && ImGui.IsWindowAppearing()) ImGui.SetNextItemOpen(true);
-                            if(ImGuiEx.TreeNode($"{Svc.Data.GetExcelSheet<WorldDCGroupType>()!.GetRow(dc.Key)?.Name}"))
+                            if(ImGuiEx.TreeNode($"{Svc.Data.GetExcelSheet<WorldDCGroupType>()!.GetRowOrDefault(dc.Key)?.Name}"))
                             {
                                 foreach(var world in dc.Value)
                                 {
