@@ -21,9 +21,9 @@ public static class NuiTools
         {
             var buttons = buttons2d[q];
             buttons = buttons.Where(x => x != null).ToArray();
-            maxButtons = Math.Clamp(maxButtons, 1, buttons.Length);
+            var curMaxButtons = Math.Clamp(maxButtons, 1, buttons.Length);
             if(!ActiveTab.ContainsKey(id)) ActiveTab[id] = buttons[0].Name;
-            var width = ImGui.GetContentRegionAvail().X / maxButtons;
+            var width = ImGui.GetContentRegionAvail().X / curMaxButtons;
             for(var i = 0; i < buttons.Length; i++)
             {
                 var b = buttons[i];
@@ -35,7 +35,7 @@ public static class NuiTools
                     ImGui.PushStyleColor(ImGuiCol.ButtonHovered, ImGui.GetStyle().Colors[(int)ImGuiCol.ButtonActive]);
                 }
                 var w = width;
-                if((i + 1) % maxButtons == 0)
+                if((i + 1) % curMaxButtons == 0)
                 {
                     w = ImGui.GetContentRegionAvail().X;
                 }
@@ -43,7 +43,7 @@ public static class NuiTools
                 {
                     ActiveTab[id] = buttons[i].Name;
                 }
-                if((i + 1) % maxButtons != 0 && i + 1 != buttons.Length)
+                if((i + 1) % curMaxButtons != 0 && i + 1 != buttons.Length)
                 {
                     ImGui.SameLine(0, 0);
                 }
