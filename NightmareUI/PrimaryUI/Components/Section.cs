@@ -35,7 +35,7 @@ internal unsafe class Section
             ImGui.TableNextColumn();
             var isOpen = ImGui.GetStateStorage().GetBoolRef(ImGui.GetID(Name + "NuiSection"));
             Color ??= ImGui.GetStyle().Colors[(int)ImGuiCol.FrameBg];
-            if(Collapsible && ImGui.IsMouseHoveringRect(ImGui.GetCursorScreenPos() - ImGui.GetStyle().CellPadding,
+            if(Collapsible && ImGui.IsWindowFocused() && ImGui.IsMouseHoveringRect(ImGui.GetCursorScreenPos() - ImGui.GetStyle().CellPadding,
                 ImGui.GetCursorScreenPos() + ImGui.GetStyle().CellPadding + new Vector2(ImGui.GetContentRegionAvail().X, ImGui.CalcTextSize(Name).Y)
                 ))
             {
