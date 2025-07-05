@@ -98,8 +98,13 @@
             <Private>False</Private>
         </Reference>
     </ItemGroup>
-
+    
     <ItemGroup>
-      <PackageReference Include="ECommons" Version="3.0.0.2" />
+        <PackageReference Include="ECommons" Version="3.0.0.2" />
     </ItemGroup>
+
+    <ItemGroup Condition="Exists('..\..\ECommons\ECommons\ECommons.csproj')">
+        <ProjectReference Include="..\..\ECommons\ECommons\ECommons.csproj" />
+    </ItemGroup>
+
 </Project>
