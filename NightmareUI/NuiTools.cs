@@ -1,9 +1,10 @@
-﻿using Dalamud.Interface.Utility;
+﻿using Dalamud.Bindings.ImGui;
+using Dalamud.Interface.Utility;
 using ECommons;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.ImGuiMethods;
 using ECommons.Logging;
-using ImGuiNET;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -126,7 +127,7 @@ public static class NuiTools
         if(ThreadLoadImageHandler.TryGetTextureWrap("ui/uld/Teleport_hr1.tex", out var tex))
         {
             size ??= ImGuiHelpers.GetButtonSize("A").Y;
-            ImGui.Image(tex.ImGuiHandle, new(size.Value), id.Item1, id.Item2);
+            ImGui.Image(tex.Handle, new(size.Value), id.Item1, id.Item2);
             return true;
         }
         return false;

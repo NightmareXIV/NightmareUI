@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NightmareUI;
 [Serializable]
-public unsafe sealed class NightmareUIState
+public sealed unsafe class NightmareUIState
 {
     public Dictionary<string, string> ActiveTab = [];
 }

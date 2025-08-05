@@ -9,7 +9,7 @@ namespace NightmareUI.Censoring;
 [DataContract(Name = "CensorConfig")]
 public class CensorConfig
 {
-    [DataMember(Name = "Seed")] [Obfuscation(Exclude = true)] public string Seed = Guid.NewGuid().ToString();
+    [DataMember(Name = "Seed")][Obfuscation(Exclude = true)] public string Seed = Guid.NewGuid().ToString();
     [DataMember(Name = "Enabled")][Obfuscation(Exclude = true)] public bool Enabled = false;
     [DataMember(Name = "LesserCensor")][Obfuscation(Exclude = true)] public bool LesserCensor = false;
 }
