@@ -1,5 +1,6 @@
-﻿using ECommons.ImGuiMethods;
-using ImGuiNET;
+﻿using Dalamud.Bindings.ImGui;
+using ECommons.ImGuiMethods;
+
 using NightmareUI.PrimaryUI.Components;
 using System;
 using System.Collections.Generic;

@@ -1,9 +1,10 @@
-﻿using Dalamud.Interface.Utility;
+﻿using Dalamud.Bindings.ImGui;
+using Dalamud.Interface.Utility;
 using ECommons;
 using ECommons.ExcelServices.TerritoryEnumeration;
 using ECommons.ImGuiMethods;
 using ECommons.Logging;
-using ImGuiNET;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,22 +13,29 @@ using System.Numerics;
 namespace NightmareUI;
 public static class NuiTools
 {
-    private static Dictionary<string, string> ActiveTab = [];
+    private static NightmareUIState State = new();
+
+    public static void SetState(NightmareUIState state)
+    {
+        State = state;
+    }
+
     public static void ButtonTabs(ButtonInfo[][] buttons2d, int maxButtons = int.MaxValue) => ButtonTabs(GenericHelpers.GetCallStackID(), buttons2d, maxButtons);
     public static void ButtonTabs(string id, ButtonInfo[][] buttons2d, int maxButtons = int.MaxValue, bool child = true)
     {
+        ImGui.PushID(id);
         ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, new Vector2(0, 1));
         for(var q = 0; q < buttons2d.Length; q++)
         {
             var buttons = buttons2d[q];
             buttons = buttons.Where(x => x != null).ToArray();
             var curMaxButtons = Math.Clamp(maxButtons, 1, buttons.Length);
-            if(!ActiveTab.ContainsKey(id)) ActiveTab[id] = buttons[0].Name;
+            if(!State.ActiveTab.ContainsKey(id)) State.ActiveTab[id] = buttons[0].InternalName;
             var width = ImGui.GetContentRegionAvail().X / curMaxButtons;
             for(var i = 0; i < buttons.Length; i++)
             {
                 var b = buttons[i];
-                var act = ActiveTab[id] == b.Name;
+                var act = State.ActiveTab[id] == b.InternalName;
                 ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 0f);
                 if(act)
                 {
@@ -41,7 +49,7 @@ public static class NuiTools
                 }
                 if(ImGui.Button(b.Name, new(w, ImGui.GetFrameHeight())))
                 {
-                    ActiveTab[id] = buttons[i].Name;
+                    State.ActiveTab[id] = buttons[i].InternalName;
                 }
                 if((i + 1) % curMaxButtons != 0 && i + 1 != buttons.Length)
                 {
@@ -57,7 +65,7 @@ public static class NuiTools
         ImGui.PopStyleVar();
         if(!child || ImGui.BeginChild($"NuiTabs{id}"))
         {
-            if(ActiveTab.TryGetValue(id, out var value))
+            if(State.ActiveTab.TryGetValue(id, out var value))
             {
                 try
                 {
@@ -65,7 +73,7 @@ public static class NuiTools
                     {
                         foreach(var b in a)
                         {
-                            if(b != null && b.Name == value)
+                            if(b != null && b.InternalName == value)
                             {
                                 b.Action();
                             }
@@ -80,16 +88,26 @@ public static class NuiTools
             }
         }
         if(child) ImGui.EndChild();
+        ImGui.PopID();
     }
 
     public record class ButtonInfo
     {
         public readonly string Name;
+        public readonly string InternalName;
         public readonly Action Action;
 
         public ButtonInfo(string name, Action action)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
+            InternalName = Name;
+            Action = action ?? throw new ArgumentNullException(nameof(action));
+        }
+
+        public ButtonInfo(string name, string internalName, Action action)
+        {
+            Name = name ?? throw new ArgumentNullException(nameof(name));
+            InternalName = internalName;
             Action = action ?? throw new ArgumentNullException(nameof(action));
         }
     }
@@ -109,7 +127,7 @@ public static class NuiTools
         if(ThreadLoadImageHandler.TryGetTextureWrap("ui/uld/Teleport_hr1.tex", out var tex))
         {
             size ??= ImGuiHelpers.GetButtonSize("A").Y;
-            ImGui.Image(tex.ImGuiHandle, new(size.Value), id.Item1, id.Item2);
+            ImGui.Image(tex.Handle, new(size.Value), id.Item1, id.Item2);
             return true;
         }
         return false;

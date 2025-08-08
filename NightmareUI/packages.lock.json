@@ -2,8 +2,11 @@
   "version": 1,
   "dependencies": {
     "net9.0-windows7.0": {
-      "ecommons": {
-        "type": "Project"
+      "ECommons": {
+        "type": "Direct",
+        "requested": "[3.0.1.3, )",
+        "resolved": "3.0.1.3",
+        "contentHash": "EmI3VUDSR8BOPFTCiEm0s/N3iSHg3u9iolyOys/lsJF0b3OtI3NvqxLLbrSlACOrtSSohOVVf7FnXupKKNLN/Q=="
       }
     }
   }

@@ -1,8 +1,9 @@
-﻿using Dalamud.Interface;
+﻿using Dalamud.Bindings.ImGui;
+using Dalamud.Interface;
 using Dalamud.Interface.Colors;
 using ECommons;
 using ECommons.ImGuiMethods;
-using ImGuiNET;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,19 +44,19 @@ internal unsafe class Section
                 Color = ImGui.GetStyle().Colors[(int)ImGuiCol.FrameBgHovered];
                 if(ImGui.IsMouseClicked(ImGuiMouseButton.Left))
                 {
-                    *isOpen = (byte)(*isOpen == 0 ? 1 : 0);
+                    isOpen = !isOpen;
                 }
             }
             if(Collapsible)
             {
                 ImGui.PushFont(UiBuilder.IconFont);
-                ImGuiEx.Text((*isOpen != 0? FontAwesomeIcon.Minus : FontAwesomeIcon.Plus).ToIconString());
+                ImGuiEx.Text((isOpen ? FontAwesomeIcon.Minus : FontAwesomeIcon.Plus).ToIconString());
                 ImGui.PopFont();
                 ImGui.SameLine();
             }
             ImGui.TableSetBgColor(ImGuiTableBgTarget.RowBg0, ImGui.ColorConvertFloat4ToU32(Color.Value));
             ImGuiEx.Text(Name);
-            if(!Collapsible || *isOpen != 0)
+            if(!Collapsible || isOpen)
             {
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();
