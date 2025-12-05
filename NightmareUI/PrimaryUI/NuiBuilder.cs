@@ -19,9 +19,9 @@ public class NuiBuilder
 
     public NuiBuilder() { }
 
-    public NuiBuilder Section(string name, Vector4? color = null, bool collapsible = false)
+    public NuiBuilder Section(string name, Vector4? color = null, bool collapsible = false, Action? rightFloat = null)
     {
-        CurrentSection = new() { Name = name, Collapsible = collapsible, Color = color };
+        CurrentSection = new() { Name = name, Collapsible = collapsible, Color = color, RightFloat = rightFloat };
         Sections.Add(CurrentSection);
         return this;
     }
@@ -265,11 +265,11 @@ public class NuiBuilder
         return this;
     }
 
-    public NuiBuilder Draw()
+    public NuiBuilder Draw(bool noCollapse = false)
     {
         foreach(var x in Sections)
         {
-            x.Draw(this);
+            x.Draw(this, noCollapse);
         }
         return this;
     }

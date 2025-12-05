@@ -19,13 +19,14 @@ internal unsafe class Section
     internal Func<bool>? Cond = null;
     internal bool CondComp;
     internal bool Collapsible;
+    internal Action? RightFloat;
 
     public bool ShouldHighlight => Widgets.OfType<ImGuiWidget>().Any(z => z.ShouldHighlight);
 
-    private static Vector2 CellPadding = new(7f);
+    public static Vector2 CellPadding { get; } =  new(7f);
 
 
-    internal void Draw(NuiBuilder builder)
+    internal void Draw(NuiBuilder builder, bool noCollapse)
     {
         var oldPadding = ImGui.GetStyle().CellPadding;
         ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, CellPadding);
@@ -34,29 +35,31 @@ internal unsafe class Section
             ImGui.TableSetupColumn(Name, ImGuiTableColumnFlags.WidthStretch);
             ImGui.TableNextRow();
             ImGui.TableNextColumn();
-            ref var isOpen = ref ImGui.GetStateStorage().GetBoolRef(ImGui.GetID(Name + "NuiSection"));
+            var id = ImGui.GetID(Name + "NuiSection");
             Color ??= ImGui.GetStyle().Colors[(int)ImGuiCol.FrameBg];
-            if(Collapsible && ImGui.IsWindowFocused() && ImGui.IsMouseHoveringRect(ImGui.GetCursorScreenPos() - ImGui.GetStyle().CellPadding,
+            if(Collapsible && ImGui.IsWindowFocused(ImGuiFocusedFlags.RootAndChildWindows) && ImGui.IsMouseHoveringRect(ImGui.GetCursorScreenPos() - ImGui.GetStyle().CellPadding,
                 ImGui.GetCursorScreenPos() + ImGui.GetStyle().CellPadding + new Vector2(ImGui.GetContentRegionAvail().X, ImGui.CalcTextSize(Name).Y)
                 ))
             {
                 ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
                 Color = ImGui.GetStyle().Colors[(int)ImGuiCol.FrameBgHovered];
-                if(ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                if(!noCollapse && ImGui.IsMouseClicked(ImGuiMouseButton.Left))
                 {
-                    isOpen = !isOpen;
+                    NuiTools.State.CollapsedHeaders.Toggle(id);
                 }
             }
             if(Collapsible)
             {
                 ImGui.PushFont(UiBuilder.IconFont);
-                ImGuiEx.Text((isOpen ? FontAwesomeIcon.Minus : FontAwesomeIcon.Plus).ToIconString());
+                ImGuiEx.Text((!NuiTools.State.CollapsedHeaders.Contains(id) ? FontAwesomeIcon.Minus : FontAwesomeIcon.Plus).ToIconString());
                 ImGui.PopFont();
                 ImGui.SameLine();
             }
+
+            var cur = ImGui.GetCursorPos();
             ImGui.TableSetBgColor(ImGuiTableBgTarget.RowBg0, ImGui.ColorConvertFloat4ToU32(Color.Value));
             ImGuiEx.Text(Name);
-            if(!Collapsible || isOpen)
+            if(!Collapsible || !NuiTools.State.CollapsedHeaders.Contains(id))
             {
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();
@@ -119,6 +122,13 @@ internal unsafe class Section
                 }
             }
             ImGui.EndTable();
+            if(RightFloat != null)
+            {
+                var cur2 = ImGui.GetCursorPos();
+                ImGui.SetCursorPos(cur);
+                ImGuiEx.RightFloat(Name + "NuiSection", RightFloat);
+                ImGui.SetCursorPos(cur2);
+            }
         }
         ImGui.Dummy(new(5f));
         ImGui.PopStyleVar();

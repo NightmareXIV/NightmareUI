@@ -13,7 +13,7 @@ using System.Numerics;
 namespace NightmareUI;
 public static class NuiTools
 {
-    private static NightmareUIState State = new();
+    public static NightmareUIState State { get; private set; } = new();
 
     public static void SetState(NightmareUIState state)
     {
