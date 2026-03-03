@@ -20,6 +20,7 @@ internal unsafe class Section
     internal bool CondComp;
     internal bool Collapsible;
     internal Action? RightFloat;
+    internal Func<bool>? Visible;
 
     public bool ShouldHighlight => Widgets.OfType<ImGuiWidget>().Any(z => z.ShouldHighlight);
 
@@ -28,6 +29,7 @@ internal unsafe class Section
 
     internal void Draw(NuiBuilder builder, bool noCollapse)
     {
+        if(Visible?.Invoke() == false) return;
         var oldPadding = ImGui.GetStyle().CellPadding;
         ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, CellPadding);
         if(ImGui.BeginTable(Name, 1, ImGuiTableFlags.Borders | ImGuiTableFlags.SizingFixedFit))
