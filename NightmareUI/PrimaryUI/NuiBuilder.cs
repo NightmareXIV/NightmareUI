@@ -39,6 +39,17 @@ public class NuiBuilder
         return this;
     }
 
+    public NuiBuilder Widget(float width, Action drawAction)
+    {
+        EnsureSectionNotNull();
+        CurrentSection.Widgets.Add(new ImGuiWidget(this, "", (x) =>
+        {
+            ImGui.SetNextItemWidth(width);
+            drawAction();
+        }, null));
+        return this;
+    }
+
     public NuiBuilder Widget(Action drawAction)
     {
         EnsureSectionNotNull();
@@ -166,6 +177,17 @@ public class NuiBuilder
         {
             ImGui.SetNextItemWidth(width);
             ImGui.InputInt(name, ref value());
+        }, help));
+        return this;
+    }
+
+    public NuiBuilder InputFloat(float width, string name, RefFloatDelegate value, string? help = null)
+    {
+        EnsureSectionNotNull();
+        CurrentSection.Widgets.Add(new ImGuiWidget(this, name, (x) =>
+        {
+            ImGui.SetNextItemWidth(width);
+            ImGui.InputFloat(name, ref value());
         }, help));
         return this;
     }
