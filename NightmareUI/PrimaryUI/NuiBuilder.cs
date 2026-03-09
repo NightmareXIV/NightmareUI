@@ -115,7 +115,11 @@ public class NuiBuilder
     public NuiBuilder EnumCombo<T>(float width, string name, RefEnumDelegate<T> value, IDictionary<T, string>? names = null, string? help = null) where T : Enum, IConvertible
     {
         EnsureSectionNotNull();
-        CurrentSection.Widgets.Add(new ImGuiWidget(this, name, (x) => ImGuiEx.EnumCombo<T>(name, ref value(), names), help));
+        CurrentSection.Widgets.Add(new ImGuiWidget(this, name, (x) =>
+        {
+            ImGui.SetNextItemWidth(width);
+            ImGuiEx.EnumCombo<T>(name, ref value(), names);
+        }, help));
         return this;
     }
 
@@ -177,6 +181,17 @@ public class NuiBuilder
         {
             ImGui.SetNextItemWidth(width);
             ImGui.InputInt(name, ref value());
+        }, help));
+        return this;
+    }
+
+    public NuiBuilder InputText(float width, string name, RefStringDelegate value, int maxLength = 512, string? help = null)
+    {
+        EnsureSectionNotNull();
+        CurrentSection.Widgets.Add(new ImGuiWidget(this, name, (x) =>
+        {
+            ImGui.SetNextItemWidth(width);
+            ImGui.InputText(name, ref value(), maxLength);
         }, help));
         return this;
     }
