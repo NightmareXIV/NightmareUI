@@ -196,13 +196,13 @@ public class NuiBuilder
         return this;
     }
 
-    public NuiBuilder InputFloat(float width, string name, RefFloatDelegate value, string? help = null)
+    public NuiBuilder InputFloat(float width, string name, RefFloatDelegate value, string? help = null, string? format = null)
     {
         EnsureSectionNotNull();
         CurrentSection.Widgets.Add(new ImGuiWidget(this, name, (x) =>
         {
             ImGui.SetNextItemWidth(width);
-            ImGui.InputFloat(name, ref value());
+            ImGui.InputFloat(name, ref value(), format:format);
         }, help));
         return this;
     }
