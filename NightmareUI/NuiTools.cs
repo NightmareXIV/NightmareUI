@@ -1,4 +1,5 @@
 ﻿using Dalamud.Bindings.ImGui;
+using Dalamud.Interface;
 using Dalamud.Interface.Utility;
 using ECommons;
 using ECommons.ExcelServices.TerritoryEnumeration;
@@ -7,6 +8,7 @@ using ECommons.Logging;
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Numerics;
 
@@ -47,7 +49,16 @@ public static class NuiTools
                 {
                     w = ImGui.GetContentRegionAvail().X;
                 }
-                if(ImGui.Button(b.Name, new(w, ImGui.GetFrameHeight() * heightMultiplier)))
+                bool ret;
+                if(b.Icon != default)
+                {
+                    ret = ImGuiEx.IconButtonWithText(b.Icon, b.Name, size:new(w, ImGui.GetFrameHeight() * heightMultiplier));
+                }
+                else
+                {
+                    ret = ImGui.Button(b.Name, new(w, ImGui.GetFrameHeight() * heightMultiplier));
+                }
+                if(ret)
                 {
                     State.ActiveTab[id] = buttons[i].InternalName;
                 }
@@ -96,6 +107,7 @@ public static class NuiTools
         public readonly string Name;
         public readonly string InternalName;
         public readonly Action Action;
+        public readonly FontAwesomeIcon Icon;
 
         public ButtonInfo(string name, Action action)
         {
@@ -109,6 +121,16 @@ public static class NuiTools
             Name = name ?? throw new ArgumentNullException(nameof(name));
             InternalName = internalName;
             Action = action ?? throw new ArgumentNullException(nameof(action));
+        }
+
+        public ButtonInfo(string name, Action action, FontAwesomeIcon icon) : this(name, action)
+        {
+            Icon = icon;
+        }
+
+        public ButtonInfo(string name, string internalName, Action action, FontAwesomeIcon icon) : this(name, internalName, action)
+        {
+            Icon = icon;
         }
     }
 
