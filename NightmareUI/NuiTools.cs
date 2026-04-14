@@ -21,7 +21,7 @@ public static class NuiTools
     }
 
     public static void ButtonTabs(ButtonInfo[][] buttons2d, int maxButtons = int.MaxValue) => ButtonTabs(GenericHelpers.GetCallStackID(), buttons2d, maxButtons);
-    public static void ButtonTabs(string id, ButtonInfo[][] buttons2d, int maxButtons = int.MaxValue, bool child = true)
+    public static void ButtonTabs(string id, ButtonInfo[][] buttons2d, int maxButtons = int.MaxValue, bool child = true, float heightMultiplier = 1f)
     {
         ImGui.PushID(id);
         ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, new Vector2(0, 1));
@@ -47,7 +47,7 @@ public static class NuiTools
                 {
                     w = ImGui.GetContentRegionAvail().X;
                 }
-                if(ImGui.Button(b.Name, new(w, ImGui.GetFrameHeight())))
+                if(ImGui.Button(b.Name, new(w, ImGui.GetFrameHeight() * heightMultiplier)))
                 {
                     State.ActiveTab[id] = buttons[i].InternalName;
                 }
