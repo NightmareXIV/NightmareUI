@@ -23,7 +23,7 @@ public static class NuiTools
     }
 
     public static void ButtonTabs(ButtonInfo[][] buttons2d, int maxButtons = int.MaxValue) => ButtonTabs(GenericHelpers.GetCallStackID(), buttons2d, maxButtons);
-    public static void ButtonTabs(string id, ButtonInfo[][] buttons2d, int maxButtons = int.MaxValue, bool child = true, float heightMultiplier = 1f)
+    public static void ButtonTabs(string id, ButtonInfo[][] buttons2d, int maxButtons = int.MaxValue, bool child = true, float heightMultiplier = 1f, bool scaling = true)
     {
         ImGui.PushID(id);
         ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, new Vector2(0, 1));
@@ -52,7 +52,7 @@ public static class NuiTools
                 bool ret;
                 if(b.Icon != default)
                 {
-                    ret = ImGuiEx.IconButtonWithText(b.Icon, b.Name, size:new(w, ImGui.GetFrameHeight() * heightMultiplier / ImGuiHelpers.GlobalScale));
+                    ret = ImGuiEx.IconButtonWithText(b.Icon, b.Name, size:new(w, ImGui.GetFrameHeight() * heightMultiplier), scaling:false);
                 }
                 else
                 {
