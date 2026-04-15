@@ -52,7 +52,7 @@ public static class NuiTools
                 bool ret;
                 if(b.Icon != default)
                 {
-                    ret = ImGuiEx.IconButtonWithText(b.Icon, b.Name, size:new(w, ImGui.GetFrameHeight() * heightMultiplier));
+                    ret = ImGuiEx.IconButtonWithText(b.Icon, b.Name, size:new(w, ImGui.GetFrameHeight() * heightMultiplier / ImGuiHelpers.GlobalScale));
                 }
                 else
                 {
