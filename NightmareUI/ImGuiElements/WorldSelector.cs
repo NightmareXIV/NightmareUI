@@ -70,7 +70,7 @@ public class WorldSelector
             regions[region] = [];
             foreach(var dc in Svc.Data.GetExcelSheet<WorldDCGroupType>()!)
             {
-                if(dc.Region == (byte)region)
+                if(dc.Region.RowId == (byte)region)
                 {
                     regions[region][dc.RowId] = [];
                     foreach(var world in ExcelWorldHelper.GetPublicWorlds(dc.RowId))
