@@ -100,7 +100,7 @@
     </ItemGroup>
     
     <ItemGroup>
-        <PackageReference Include="ECommons" Version="3.0.1.9" />
+        <PackageReference Include="ECommons" Version="3.2.0.6" />
     </ItemGroup>
 
     <ItemGroup Condition="Exists('..\..\ECommons\ECommons\ECommons.csproj')">
